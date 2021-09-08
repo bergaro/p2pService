@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
+group = 'ru.netology'
+version = '0.0.1'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.4'
+    implementation 'org.springframework.boot:spring-boot-starter-aop:2.5.4'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
+    implementation group: 'com.fasterxml.uuid', name: 'java-uuid-generator', version: '3.1.0'
+
+    testImplementation 'org.testcontainers:junit-jupiter:1.16.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.4'
+}
+
+test {
+    useJUnitPlatform()
+}

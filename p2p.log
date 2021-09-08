@@ -1,0 +1,24 @@
+2021-09-07 23:54:17 INFO  LoggingAspect:50 - method-execution::confirmOperation() with argument[s] = [RqConfirmDTO{code='0000', operationId='12314', amountWithCommission=0}]
+2021-09-07 23:54:17 INFO  LoggingAspect:50 - method-execution::acceptOperation() with argument[s] = [RqConfirmDTO{code='0000', operationId='12314', amountWithCommission=0}]
+2021-09-07 23:54:17 INFO  LoggingAspect:50 - method-execution::containsOperation() with argument[s] = [12314]
+2021-09-07 23:54:17 INFO  LoggingAspect:69 - method-execution:containsOperation() with result = false
+2021-09-07 23:54:17 ERROR LoggingAspect:28 - Exception in ru.netology.p2p.service.TransferService.acceptOperation() with message = Incorrect GUID
+2021-09-07 23:54:17 ERROR LoggingAspect:28 - Exception in ru.netology.p2p.controller.AppMainController.confirmOperation() with message = Incorrect GUID
+2021-09-07 23:54:22 INFO  LoggingAspect:50 - method-execution::transfer() with argument[s] = [RqTransferDTO{cardFromNumber='string', cardFromValidTill='string', cardFromCVV='string', cardToNumber='string', amount=[amount='0', currency='string'], commission='0.0', transferSum='0'}]
+2021-09-07 23:54:22 ERROR LoggingAspect:28 - Exception in ru.netology.p2p.controller.AppMainController.transfer() with message = Invalid input data
+2021-09-08 00:08:13 INFO  LoggingAspect:50 - method-execution::transfer() with argument[s] = [RqTransferDTO{cardFromNumber='1111111111111111', cardFromValidTill='11/22', cardFromCVV='123', cardToNumber='2222222222222222', amount=[amount='12300', currency='RUR'], commission='0.0', transferSum='0'}]
+2021-09-08 00:08:13 INFO  LoggingAspect:50 - method-execution::transferOperation() with argument[s] = [RqTransferDTO{cardFromNumber='1111111111111111', cardFromValidTill='11/22', cardFromCVV='123', cardToNumber='2222222222222222', amount=[amount='12300', currency='RUR'], commission='0.0', transferSum='0'}]
+2021-09-08 00:08:13 INFO  LoggingAspect:50 - method-execution::checkAccountBalance() with argument[s] = [RqTransferDTO{cardFromNumber='1111111111111111', cardFromValidTill='11/22', cardFromCVV='123', cardToNumber='2222222222222222', amount=[amount='12300', currency='RUR'], commission='1.0', transferSum='12423'}]
+2021-09-08 00:08:13 INFO  LoggingAspect:69 - method-execution:checkAccountBalance() with result = true
+2021-09-08 00:08:13 INFO  LoggingAspect:50 - method-execution::transfer() with argument[s] = [RqTransferDTO{cardFromNumber='1111111111111111', cardFromValidTill='11/22', cardFromCVV='123', cardToNumber='2222222222222222', amount=[amount='12300', currency='RUR'], commission='1.0', transferSum='12423'}, RsTransferDTO{operationId='null'}]
+2021-09-08 00:08:13 DEBUG LoggingAspect:73 - Enter: ru.netology.p2p.repository.TransferRepository.transfer() with result = null
+2021-09-08 00:08:13 INFO  LoggingAspect:69 - method-execution:transferOperation() with result = RsTransferDTO{operationId='b6b330ea-101f-11ec-baf5-7ff0929bb2af'}
+2021-09-08 00:08:13 INFO  LoggingAspect:69 - method-execution:transfer() with result = RsTransferDTO{operationId='b6b330ea-101f-11ec-baf5-7ff0929bb2af'}
+2021-09-08 00:08:13 INFO  LoggingAspect:50 - method-execution::confirmOperation() with argument[s] = [RqConfirmDTO{code='0000', operationId='b6b330ea-101f-11ec-baf5-7ff0929bb2af', amountWithCommission=0}]
+2021-09-08 00:08:13 INFO  LoggingAspect:50 - method-execution::acceptOperation() with argument[s] = [RqConfirmDTO{code='0000', operationId='b6b330ea-101f-11ec-baf5-7ff0929bb2af', amountWithCommission=0}]
+2021-09-08 00:08:13 INFO  LoggingAspect:50 - method-execution::containsOperation() with argument[s] = [b6b330ea-101f-11ec-baf5-7ff0929bb2af]
+2021-09-08 00:08:13 INFO  LoggingAspect:69 - method-execution:containsOperation() with result = true
+2021-09-08 00:08:13 INFO  LoggingAspect:50 - method-execution::confirm() with argument[s] = [RqConfirmDTO{code='0000', operationId='b6b330ea-101f-11ec-baf5-7ff0929bb2af', amountWithCommission=0}, RsTransferDTO{operationId='null'}]
+2021-09-08 00:08:13 DEBUG LoggingAspect:73 - Enter: ru.netology.p2p.repository.TransferRepository.confirm() with result = null
+2021-09-08 00:08:13 INFO  LoggingAspect:69 - method-execution:acceptOperation() with result = RsTransferDTO{operationId='b6b330ea-101f-11ec-baf5-7ff0929bb2af'}
+2021-09-08 00:08:13 INFO  LoggingAspect:69 - method-execution:confirmOperation() with result = RsTransferDTO{operationId='b6b330ea-101f-11ec-baf5-7ff0929bb2af'}

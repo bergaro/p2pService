@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+  rest:
+    build: .
+    image: service/transfer
+    container_name: transfer_srv
+    ports:
+      - "5500:5500"
