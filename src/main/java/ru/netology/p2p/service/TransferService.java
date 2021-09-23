@@ -1,72 +1,79 @@
 package ru.netology.p2p.service;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import ru.netology.p2p.exceptions.ErrorTransfer;
 import ru.netology.p2p.objectsDTO.RqConfirmDTO;
 import ru.netology.p2p.objectsDTO.RqTransferDTO;
 import ru.netology.p2p.objectsDTO.RsTransferDTO;
+import ru.netology.p2p.exceptions.ErrorTransfer;
 import ru.netology.p2p.repository.TransferRepository;
+
 
 @Service
 public class TransferService {
 
-    private final ApplicationContext appContext;
+    private RsTransferDTO operationRs;
     private final TransferRepository transferRepository;
 
-    private final static double COMMISSION = 1d;
+    private final static double COMMISSION = 1;
     private final static String NOT_MONEY = "Not enough money";
+    private final static String TRANSACTION_ERROR = "Transaction error";
 
-    public TransferService(ApplicationContext appContext, TransferRepository transferRepository) {
-        this.appContext = appContext;
+    public TransferService(RsTransferDTO operationRs, TransferRepository transferRepository) {
         this.transferRepository = transferRepository;
+        this.operationRs = operationRs;
     }
     /**
-     * Метод производит расчёт комиссии
-     * для определения суммы списания с карты отправителя.
-     * И сетит сумму списания для отправителя в объект входящего сообщения.
-     *
-     * @param rqTransferDTO объект входящего сообщения
+     * Рассчёт комиссии по операции и добавление полной суммы в объект rqTransferDTO
+     * @param rqTransferDTO
      */
-    public void setTransferSum(RqTransferDTO rqTransferDTO) {
+    private void setTransferSum(RqTransferDTO rqTransferDTO) {
         int commissionSum = (int)(rqTransferDTO.getAmount() * rqTransferDTO.getCommission() / 100);
         rqTransferDTO.setTransferSum(rqTransferDTO.getAmount() + commissionSum);
     }
-    /**
-     * Метод сетит информация по коммиссии и сумме операции в requestDTO.
-     * Если бланс карты отправителя позволяет произвести перевод, формирует расходную операцию.
-     * Иначе формирует responseDTO по исключению о нехватке денежных средств.
-     *
-     * @param rqTransferDTO объект входящего сообщения
-     * @return объект исходящего сообщения
-     */
+
     public RsTransferDTO transferOperation(RqTransferDTO rqTransferDTO) {
-        RsTransferDTO rsTransferDTO;
         rqTransferDTO.setCommission(COMMISSION);
         setTransferSum(rqTransferDTO);
         if(transferRepository.checkAccountBalance(rqTransferDTO)) {
-            rsTransferDTO = appContext.getBean("appResponse", RsTransferDTO.class);
-            transferRepository.transfer(rqTransferDTO, rsTransferDTO);
+            transferRepository.transfer(rqTransferDTO, operationRs);
         } else {
             throw new ErrorTransfer(NOT_MONEY);
         }
-        return rsTransferDTO;
+        return operationRs;
     }
-    /**
-     * Метод производит подтверждение расходной операции и перевод денежных средств, если таковая сформирована.
-     * Иначе формирует responseDTO по исключению об отсутствии операции перевода.
-     *
-     * @param rqConfirmDTO объект входящего сообщения
-     * @return объект исходящего сообщения
-     */
+
     public RsTransferDTO acceptOperation(RqConfirmDTO rqConfirmDTO) {
-        RsTransferDTO rsTransferDTO;
-        if(transferRepository.containsOperation(rqConfirmDTO.getOperationId())) {
-            rsTransferDTO = appContext.getBean("appResponse", RsTransferDTO.class);
-            transferRepository.confirm(rqConfirmDTO, rsTransferDTO);
+        if(transferRepository.containsUnconfirmedOperation(rqConfirmDTO.getOperationId())) {
+            confirm(rqConfirmDTO, operationRs);
         } else {
             throw new ErrorTransfer("Incorrect GUID");
         }
-        return rsTransferDTO;
+        return operationRs;
+    }
+
+    public void confirm(RqConfirmDTO rqConfirmDTO, RsTransferDTO rsTransferDTO) {
+        RqTransferDTO rqTransferDTO = transferRepository.removeFromUnconfirmedRequests(rqConfirmDTO);
+        if(transferRepository.checkAccountBalance(rqTransferDTO)) {
+            if(!p2pOperation(rqTransferDTO)) {
+                throw new ErrorTransfer(TRANSACTION_ERROR);
+            }
+            rsTransferDTO.setOperationId(rqConfirmDTO.getOperationId());
+        }
+    }
+
+    private synchronized boolean p2pOperation(RqTransferDTO rqTransferDTO) {
+        String accSender = rqTransferDTO.getCardFromNumber();
+        String accRecipient = rqTransferDTO.getCardToNumber();
+
+        int transferAmountWithCommission = rqTransferDTO.getTransferSum();
+        int transferAmountWithoutCommission = rqTransferDTO.getAmount();
+
+        int senderAmount =  transferRepository.getAccountsBalance(accSender) -  transferAmountWithCommission;
+        int recipientAmount = transferRepository.getAccountsBalance(accRecipient) - transferAmountWithoutCommission;
+
+        boolean senderBalanceChanged = transferRepository.updateAccountBalance(accSender, senderAmount);
+        boolean recipientBalanceChanged = transferRepository.updateAccountBalance(accRecipient, recipientAmount);
+
+        return senderBalanceChanged && recipientBalanceChanged;
     }
 }
